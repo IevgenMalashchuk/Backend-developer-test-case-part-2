@@ -66,7 +66,30 @@ app.post('/upload', function (req, res) {
 });
 /* API path that will download the files */
 app.get('/download', function (req, res) {
-  res.json({msg: "Excel file going to be here."});
+  var datetime = new Date();
+  var book = new Excel.Workbook();
+  var sheet = book.addWorksheet('Sheet1');
+  res.set('Expires', 'Tue, 03 Jul 2001 06:00:00 GMT');
+  res.set('Cache-Control', 'max-age=0, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Last-Modified', datetime + ' GMT');
+  res.set('Content-Type','application/force-download');
+  res.set('Content-Type','application/octet-stream');
+  res.set('Content-Type','application/download');
+  res.set('Content-Disposition','attachment;filename=current.xlsx');
+  res.set('Content-Transfer-Encoding','binary');
+  sheet.getCell('A1').value = 'Machine';
+  sheet.getCell('B1').value = 'attribute';
+  sheet.getCell('C1').value = 'reading';
+  app.models.Machine.find({}, function(err, models){
+    models.forEach(function(item, i, arr) {
+      sheet.getCell('A' + (i + 2)).value = item.machine;
+      sheet.getCell('B' + (i + 2)).value = item.attribute;
+      sheet.getCell('C' + (i + 2)).value = item.reading;
+    });
+    book.xlsx.write(res).then(function() {
+      res.send();
+    });
+  });
 });
 
 app.start = function() {
