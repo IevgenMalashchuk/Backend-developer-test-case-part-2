@@ -1,1 +1,12 @@
-{}
+{
+  "machines": {
+    "host": "localhost",
+    "port": 5432,
+    "url": "root",
+    "database": "machines",
+    "password": "megalook1",
+    "name": "machines",
+    "user": "root",
+    "connector": "postgresql"
+  }
+}
