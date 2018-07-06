@@ -66,7 +66,7 @@ app.post('/upload', function (req, res) {
 });
 /* API path that will download the files */
 app.get('/download', function (req, res) {
-  res.json(req);
+  res.json({msg: "Excel file going to be here."});
 });
 
 app.start = function() {
