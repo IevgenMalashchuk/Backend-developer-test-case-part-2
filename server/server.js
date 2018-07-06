@@ -17,19 +17,56 @@ var storage = multer.diskStorage({ // multers disk storage settings
       cb(null, file.fieldname + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1])
   }
 });
-
-var upload = multer({ //multer settings
+var upload = multer({ // multer settings
   storage: storage
 }).single('file');
-/** API path that will upload the files */
+
+/* API path that will upload the files */
 app.post('/upload', function (req, res) {
   upload(req, res, function (err) {
     if (err) {
       res.json({error_code: 1, err_desc: err});
       return;
     }
+    /* Multer gives us file info in req.file object */
+    if(!req.file){
+      res.json({error_code: 1, err_desc: "No file passed"});
+      return;
+    }
+    try {
+      var workbook = new Excel.Workbook();
+      workbook.xlsx.readFile(req.file.path)
+        .then(function() {
+          // use workbook
+          var worksheet = workbook.getWorksheet('Sheet1');
+          for (var i = 2; i <= worksheet.rowCount; i++) {
+            var data = {
+              "machine": parseInt(worksheet.getCell('A' + i).value),
+              "attribute": worksheet.getCell('B' + i).value,
+              "reading": parseFloat(worksheet.getCell('C' + i).value)
+            };
+            app.models.Machine.upsertWithWhere(
+              {"machine": data.machine, "attribute": data.attribute},
+              data,
+              function(err, obj){
+                if(err){
+                  console.log(err);
+                  console.log(obj);
+                }
+              }
+            );
+          }
+        });
+    } catch (e){
+      res.json({error_code: 1, err_desc: "Corrupted excel file"});
+      return;
+    }
     res.json({error_code: 0, err_desc: null});
   });
+});
+/* API path that will download the files */
+app.get('/download', function (req, res) {
+  res.json(req);
 });
 
 app.start = function() {

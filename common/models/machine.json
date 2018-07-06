@@ -6,7 +6,7 @@
     "validateUpsert": true
   },
   "properties": {
-    "id": {
+    "machine": {
       "type": "number",
       "required": true
     },
@@ -15,7 +15,7 @@
       "required": true
     },
     "reading": {
-      "type": "number",
+      "type": "string",
       "required": true
     }
   },
