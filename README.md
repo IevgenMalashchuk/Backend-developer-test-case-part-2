@@ -11,3 +11,8 @@ Run:
 ```
 node .
 ```
+
+Example endpoint that given a machine, gives the current values of its attributes:
+```
+http://localhost:3000/api/Machines?filter=%7B%22where%22%3A%7B%22machine%22%3A88%7D%7D
+```
